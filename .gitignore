@@ -1,0 +1,9 @@
+# Ignore everything
+*
+
+# Allow project folders
+!.gitignore
+!4o/
+!4o/**
+!GPT生日/
+!GPT生日/**
