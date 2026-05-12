@@ -350,14 +350,29 @@
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: var(--border-light); }
 
+    .sidebar-backdrop {
+      display: none; position: fixed; inset: 0; z-index: 35;
+      background: rgba(0,0,0,0.5);
+    }
+    .sidebar-backdrop.visible { display: block; }
+
     @media (max-width: 768px) {
-      .sidebar { width: 260px; }
-      .content-wrapper { margin-left: 0; }
-      .sidebar { transform: translateX(-100%); }
+      .sidebar {
+        width: 280px; transform: translateX(-100%);
+        z-index: 45;
+      }
       .sidebar.mobile-open { transform: translateX(0); }
-      .page { padding: 36px 28px; }
-      .page::before { left: 18px; }
+      .content-wrapper { margin-left: 0 !important; }
+      .page { padding: 32px 20px; }
+      .page::before { left: 12px; }
+      .page-header { margin-bottom: 20px; }
+      .page-title { font-size: 1.05rem; }
       .media-grid { grid-template-columns: repeat(2, 1fr); }
+      .topbar-title { font-size: 0.7rem; }
+      .page-refresh { top: 14px; right: 20px; }
+      .page-number { right: 20px; }
+      .easter-egg-trigger { left: 20px; }
+      .cover-title { font-size: clamp(1.6rem, 5vw, 4rem); }
     }
   </style>
 </head>
@@ -395,6 +410,7 @@
       </div>
     </div>
 
+    <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="closeSidebar()"></div>
     <nav class="sidebar" id="sidebar">
       <div class="sidebar-section-title" id="sidebar-title">目录 / Contents</div>
     </nav>
@@ -1144,7 +1160,7 @@ Please do not imitate dangerous behavior.`,
         item.className = 'sidebar-item' + (i === currentPage ? ' active' : '');
         item.dataset.index = i;
         item.innerHTML = '<span class="sidebar-item-index">' + String(i+1).padStart(2,'0') + '</span>' + getSidebarTitle(p);
-        item.onclick = () => goToPage(i);
+        item.onclick = () => { goToPage(i); if (isMobile()) closeSidebar(); };
         sidebar.appendChild(item);
       });
     }
@@ -1155,10 +1171,24 @@ Please do not imitate dangerous behavior.`,
       });
     }
 
+    function isMobile() { return window.innerWidth <= 768; }
+
     function toggleSidebar() {
-      sidebarOpen = !sidebarOpen;
-      document.getElementById('sidebar').classList.toggle('collapsed', !sidebarOpen);
-      document.getElementById('content-wrapper').classList.toggle('expanded', !sidebarOpen);
+      if (isMobile()) {
+        const sidebar = document.getElementById('sidebar');
+        const backdrop = document.getElementById('sidebar-backdrop');
+        const open = sidebar.classList.toggle('mobile-open');
+        backdrop.classList.toggle('visible', open);
+      } else {
+        sidebarOpen = !sidebarOpen;
+        document.getElementById('sidebar').classList.toggle('collapsed', !sidebarOpen);
+        document.getElementById('content-wrapper').classList.toggle('expanded', !sidebarOpen);
+      }
+    }
+
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.remove('mobile-open');
+      document.getElementById('sidebar-backdrop').classList.remove('visible');
     }
 
     function renderPage() {
