@@ -3,6 +3,7 @@
 
 # Allow project folders
 !.gitignore
+!.gitattributes
 !4o/
 !4o/**
 !GPT生日/
